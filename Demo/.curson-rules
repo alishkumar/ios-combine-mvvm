@@ -1,0 +1,38 @@
+---
+
+## ⚙️ `.cursor-rules`
+
+This is where you list your **Cursor IDE automation rules and agent preferences**, to show you worked with AI effectively.
+
+### ✅ What to include:
+
+```txt
+.cursor-rules
+
+# Cursor AI Preferences and Rules
+
+# Preferred Language
+language: Swift
+
+# Project Architecture
+architecture: MVVM, Modular
+
+# UI Framework
+ui_framework: SwiftUI
+
+# AI Instructions
+ai_instructions:
+  - Prefer @Published and ObservableObject for state
+  - Use Task/async-await for API calls
+  - Show loading/progress states
+  - Auto-format response JSON as FoodItem list
+  - Organize views into Camera, Analysis, and History tabs
+  - Use UserDefaults for simple local storage
+  - Avoid UIKit unless required (e.g. UIImagePicker)
+
+# Cursor Tools
+tools:
+  - SweetPad (for iOS simulator)
+  - GitHub (commit per feature)
+  - Vision API via OpenAI
+

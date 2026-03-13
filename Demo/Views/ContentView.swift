@@ -13,6 +13,11 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
+            FaceTaggingView()
+                .tabItem {
+                    Label("Faces", systemImage: "person.crop.square")
+                }
+            
             NewsView(viewModel: newsViewModel)
                 .tabItem {
                     Label("News", systemImage: "newspaper")
@@ -32,7 +37,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Explore", systemImage: "binoculars")
                 }
-            
+                        
             ProfileView()
                 .tabItem {
                     Label("My Account", systemImage: "person")

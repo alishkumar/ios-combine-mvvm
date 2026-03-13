@@ -3,6 +3,53 @@
 ## Overview
 This document describes the architecture, implementation, and features of the News and Bookmarks sections in the Demo app.
 
+## Faces Section (Photo Library Face Tagging)
+
+### Overview
+The Faces section scans the user’s Photo Library, detects faces using Apple’s Vision framework, overlays bounding boxes, and lets users tag a face with a person name.
+
+### Architecture
+- **Pattern**: MVVM (SwiftUI)
+- **View**: `FaceTaggingView` (handles UI states, grid of detected photos, and face-tap interactions)
+- **ViewModel**: `FaceTaggingViewModel` (permission state, scan progress, results, tagging updates)
+- **Service**: `PhotoFaceService` (Photo Library scan + Vision face detection)
+- **Model**: `FacePhoto` and `DetectedFace`
+
+### Data Flow
+```
+User taps "Scan Photo Library"
+  -> FaceTaggingViewModel.startScan()
+  -> PhotoFaceService.scanLibrary()
+  -> Vision detects faces per asset
+  -> ViewModel maps results to FacePhoto[]
+  -> UI renders grid with bounding boxes
+  -> User taps a face -> Tag sheet -> updates DetectedFace.tag
+```
+
+### Assumptions
+- Only image assets are scanned (no videos).
+- Bounding boxes are derived from Vision’s normalized coordinates and converted to view space.
+- Tags are stored in memory for this demo (no persistence across app restarts).
+- The app runs on device or simulator with Photos access enabled.
+
+### Challenges & Solutions
+- **Face bounding box alignment**: Vision returns normalized coordinates. Converted them to view coordinates using image size math in `FaceBoundingBox`.
+- **Smooth scanning feedback**: A progress bar is shown during library scan, with state updates on the main thread.
+- **Permission handling**: Graceful UI for `.notDetermined`, `.authorized/.limited`, and denied states with a Settings link.
+
+### How to Run
+1. Open the project in Xcode.
+2. Build and run on a device or simulator.
+3. Allow Photo Library access when prompted.
+4. Tap “Scan Photo Library” to detect faces.
+5. Tap a detected face to add a name.
+
+### Key Files
+- `Demo/Views/FaceTaggingView.swift`
+- `Demo/ViewModels/FaceTaggingViewModel.swift`
+- `Demo/Services/PhotoFaceService.swift`
+- `Demo/Models/FacePhoto.swift`
+
 ## Architecture
 
 ### MVVM Pattern

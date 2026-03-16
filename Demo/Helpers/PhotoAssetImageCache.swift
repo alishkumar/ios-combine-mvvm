@@ -14,8 +14,8 @@ final class PhotoAssetImageCache {
     private let cache = NSCache<NSString, UIImage>()
 
     private init() {
-        cache.countLimit = 300
-        cache.totalCostLimit = 60 * 1024 * 1024
+        cache.countLimit = 20
+        cache.totalCostLimit = 20 * 1024 * 1024
     }
 
     func image(for asset: PHAsset,

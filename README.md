@@ -6,7 +6,7 @@ This document describes the architecture, implementation, and features of the Ne
 ## Faces Section (Photo Library Face Tagging)
 
 ### Overview
-The Faces section scans the user’s Photo Library, detects faces using Apple’s Vision framework, overlays bounding boxes, and lets users tag a face with a person name.
+The Faces section scans the user’s Photo Library, detects faces using Apple’s Vision framework, overlays bounding boxes, and lets users tag a face with a person name. The grid supports pinch-to-zoom from 1 to 32 columns with tuned spacing and smooth scrolling.
 
 ### Architecture
 - **Pattern**: MVVM (SwiftUI)
@@ -23,18 +23,20 @@ User taps "Scan Photo Library"
   -> Vision detects faces per asset
   -> ViewModel maps results to FacePhoto[]
   -> UI renders grid with bounding boxes
-  -> User taps a face -> Tag sheet -> updates DetectedFace.tag
+  -> User taps a face -> Tag sheet (photo preview + highlight) -> updates DetectedFace.tag
 ```
 
 ### Assumptions
 - Only image assets are scanned (no videos).
-- Bounding boxes are derived from Vision’s normalized coordinates and converted to view space.
+- Bounding boxes are derived from Vision’s normalized coordinates and converted to view space, accounting for aspectFill/aspectFit.
 - Tags are stored in memory for this demo (no persistence across app restarts).
+- The grid requests retina-scale thumbnails sized to the current column count.
 - The app runs on device or simulator with Photos access enabled.
 
 ### Challenges & Solutions
-- **Face bounding box alignment**: Vision returns normalized coordinates. Converted them to view coordinates using image size math in `FaceBoundingBox`.
-- **Smooth scanning feedback**: A progress bar is shown during library scan, with state updates on the main thread.
+- **Face bounding box alignment**: Vision returns normalized coordinates. Converted them to view coordinates using image size and aspectFill/fit math in `FaceBoundingBox` for accurate tap targets.
+- **Smooth scanning feedback**: A circular progress ring with status text is shown during library scan, with state updates on the main thread.
+- **Scrolling performance**: Limited in-memory cache to 20 images and added a preheat window (index -5 to +5) while scrolling.
 - **Permission handling**: Graceful UI for `.notDetermined`, `.authorized/.limited`, and denied states with a Settings link.
 
 ### How to Run
@@ -43,6 +45,7 @@ User taps "Scan Photo Library"
 3. Allow Photo Library access when prompted.
 4. Tap “Scan Photo Library” to detect faces.
 5. Tap a detected face to add a name.
+6. Pinch to zoom the grid (1 to 32 columns).
 
 ### Key Files
 - `Demo/Views/FaceTaggingView.swift`

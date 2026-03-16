@@ -94,7 +94,15 @@ final class FaceTaggingViewModel: ObservableObject {
                     self?.scanProgress = progress
                 }
                 let mapped = result.map { pair in
-                    FacePhoto(id: pair.0.localIdentifier, asset: pair.0, faces: pair.1)
+                    let assetId = pair.0.localIdentifier
+                    let facesWithTags = pair.1.map { face in
+                        var updated = face
+                        if let stored = FaceTagStore.shared.tag(for: assetId, boundingBox: face.boundingBox) {
+                            updated.tag = stored
+                        }
+                        return updated
+                    }
+                    return FacePhoto(id: assetId, asset: pair.0, faces: facesWithTags)
                 }
                 await MainActor.run {
                     self.facePhotos = mapped
@@ -120,5 +128,8 @@ final class FaceTaggingViewModel: ObservableObject {
         }
         
         facePhotos[photoIndex] = updatedPhoto
+        FaceTagStore.shared.setTag(name.trimmingCharacters(in: .whitespacesAndNewlines),
+                                   for: photo.id,
+                                   boundingBox: face.boundingBox)
     }
 }
